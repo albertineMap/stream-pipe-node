@@ -2,7 +2,8 @@
 const express = require('express')
 const app = express()
 const port = 3000
-//let fs = require('fs')
+let fs = require('fs')
+var Mysqldump = require('mysqldump-stream');
 
 var mysql = require('mysql');
 
@@ -51,7 +52,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/get_file', async (req, res) => {
-  var Mysqldump = require('mysqldump-stream');
+
   var mysqldump = new Mysqldump('nserver_test', {
     gzip: true, //default: false
     host: 'localhost', //default
@@ -64,16 +65,6 @@ app.get('/get_file', async (req, res) => {
   mysqldump.pipe(fs.createWriteStream('./nserver_test.sql.gz'));
 })
   
-var Mysqldump = require('mysqldump-stream');
-var mysqldump = new Mysqldump('mydatabase', {
-  gzip: true, //default: false
-  host: 'localhost', //default
-  user: 'root', //default: process.env.USER || 'root'
-  password: '' //default: false
-});
-var fs = require('fs');
-mysqldump.start();
-mysqldump.pipe(fs.createWriteStream('./mydatabase.sql.gz'));
 
 
 
