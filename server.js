@@ -12,7 +12,14 @@ var mysql = require('mysql');
 
 const dumpFileName = `${Math.round(Date.now() / 1000)}.dump.sql`
 const writeStream = fs.createWriteStream(dumpFileName)
-const dump = spawn('mysqldump', [
+
+// pour tester spawn
+// spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['-v'], {stdio: 'inherit'})
+// .on('finish', function () {
+//     console.log('Completed')
+// })
+
+const dump = spawn(/^win/.test(process.platform) ? 'mysqldump.cmd' : 'mysqldump', [
     '-u',
     'root',
     '-p',
