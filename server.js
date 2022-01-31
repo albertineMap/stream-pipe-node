@@ -1,18 +1,16 @@
-import mysqldump from 'mysqldump';
-
-import express from 'express';
-//const express = require('express')
+const mysqldump = require('mysqldump')
+const express = require('express')
 const app = express()
 const port = 3000
 let fs = require('fs')
 
-//var mysql = require('mysql');
+var mysql = require('mysql');
 
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-//   database:"nserver_test"
+  database:"nserver_test"
 });
 
 //connection
