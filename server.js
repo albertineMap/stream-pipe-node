@@ -50,34 +50,23 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-
-
-// dump the result straight to a compressed file
-mysqldump({
-    connection: {
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'nserver_test',
-    },
-    dumpToFile: './dump.sql.gz',
-    compressFile: true,
-});
-
-let file = './dump.sql.gz'
-
-app.get('/get_file', (req, res) => {
-    fs.stat(file, (err, stat) => {
-        let total = stat.size
-        let read = fs.createReadStream(file)
-        res.writeHead(200, {
-            'Content-Length': total,
-            'Content-Type': 'application/javascript',
-            'Content-Encoding': 'gzip',
-            "Content-Disposition": 'attachment; filename="demo.zip"',
-            }); 
-        read.pipe(res) 
-    })
+app.get('/get_file', async (req, res) => {
+    const result = await mysqldump({
+        connection: {
+            host: 'localhost',
+            user: 'root',
+            password: '',
+            database: 'nserver_test',
+        },
+    });
+    let buffer = Buffer.from(result)
+    let read = fs.createReadStream(buffer)
+    res.writeHead(200, {
+        'Content-Type': 'application/javascript',
+        'Content-Encoding': 'gzip',
+        "Content-Disposition": 'attachment; filename="nserverdb.gz"',
+        }); 
+    read.pipe(res) 
 })
   
 app.listen(port, () => {
