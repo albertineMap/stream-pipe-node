@@ -12,7 +12,7 @@ var con = mysql.createConnection({
   password: "",
   database:"nserver_test"
 });
-
+/*
 //connection
 con.connect(function(err) {
   if (err) throw err;
@@ -45,7 +45,7 @@ con.connect(function(err) {
     console.log(result);
   });
 });
-
+*/
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
@@ -72,8 +72,9 @@ app.get('/get_file', (req, res) => {
         let read = fs.createReadStream(file)
         res.writeHead(200, {
             'Content-Length': total,
-            'Content-Type': 'video/mp4',
-            "Content-Disposition": 'attachment; filename="demo.mp4"',
+            'Content-Type': 'application/javascript',
+            'Content-Encoding': 'gzip',
+            "Content-Disposition": 'attachment; filename="demo.zip"',
             }); 
         read.pipe(res) 
     })
