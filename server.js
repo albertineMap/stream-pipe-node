@@ -4,6 +4,18 @@ const app = express()
 const port = 3000
 let fs = require('fs')
 let file = 'demo.mp4'
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root"
+});
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
