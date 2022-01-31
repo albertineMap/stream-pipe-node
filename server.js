@@ -1,8 +1,8 @@
-const mysqldump = require('mysqldump')
+//const mysqldump = require('mysqldump')
 const express = require('express')
 const app = express()
 const port = 3000
-let fs = require('fs')
+//let fs = require('fs')
 
 var mysql = require('mysql');
 
@@ -51,24 +51,32 @@ app.get('/', (req, res) => {
 })
 
 app.get('/get_file', async (req, res) => {
-    const result = await mysqldump({
-        connection: {
-            host: 'localhost',
-            user: 'root',
-            password: '',
-            database: 'nserver_test',
-        },
-    });
-    let buffer = Buffer.from(result)
-    let read = fs.createReadStream(buffer)
-    res.writeHead(200, {
-        'Content-Type': 'application/javascript',
-        'Content-Encoding': 'gzip',
-        "Content-Disposition": 'attachment; filename="nserverdb.gz"',
-        }); 
-    read.pipe(res) 
+  var Mysqldump = require('mysqldump-stream');
+  var mysqldump = new Mysqldump('nserver_test', {
+    gzip: true, //default: false
+    host: 'localhost', //default
+    port: 3000, //default
+    user: 'root', //default: process.env.USER || 'root'
+    password: '' //default: false
+  });
+  var fs = require('fs');
+  mysqldump.start();
+  mysqldump.pipe(fs.createWriteStream('./nserver_test.sql.gz'));
 })
   
+var Mysqldump = require('mysqldump-stream');
+var mysqldump = new Mysqldump('mydatabase', {
+  gzip: true, //default: false
+  host: 'localhost', //default
+  user: 'root', //default: process.env.USER || 'root'
+  password: '' //default: false
+});
+var fs = require('fs');
+mysqldump.start();
+mysqldump.pipe(fs.createWriteStream('./mydatabase.sql.gz'));
+
+
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
