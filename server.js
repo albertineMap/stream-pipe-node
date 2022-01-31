@@ -1,10 +1,12 @@
+import mysqldump from 'mysqldump';
 
-const express = require('express')
+import express from 'express';
+//const express = require('express')
 const app = express()
 const port = 3000
 let fs = require('fs')
-let file = 'demo.mp4'
-var mysql = require('mysql');
+
+//var mysql = require('mysql');
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -49,6 +51,22 @@ con.connect(function(err) {
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
+
+
+
+// dump the result straight to a compressed file
+mysqldump({
+    connection: {
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'nserver_test',
+    },
+    dumpToFile: './dump.sql.gz',
+    compressFile: true,
+});
+
+let file = './dump.sql.gz'
 
 app.get('/get_file', (req, res) => {
     fs.stat(file, (err, stat) => {
