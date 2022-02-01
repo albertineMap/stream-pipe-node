@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^17.0.13",
+    "cross-spawn": "^7.0.3",
     "express": "^4.17.2",
     "mysql": "^2.18.1",
     "mysqldump": "^3.2.0",

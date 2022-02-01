@@ -1,49 +1,82 @@
-// const mysqldump = require('mysqldump')
+const mysqldump = require('mysqldump')
 const express = require('express')
-var Mysqldump = require('mysqldump-stream');
-const fs = require('fs')
-const spawn = require('child_process').spawn
-
 const app = express()
 const port = 3000
-//let fs = require('fs')
+let fs = require('fs')
+//var Mysqldump = require('mysqldump-stream');
+const spawn = require('child_process').spawn
 
 var mysql = require('mysql');
 
-const dumpFileName = `${Math.round(Date.now() / 1000)}.dump.sql`
-const writeStream = fs.createWriteStream(dumpFileName)
 
-// pour tester spawn
-// spawn(/^win/.test(process.platform) ? 'npm.cmd' : 'npm', ['-v'], {stdio: 'inherit'})
-// .on('finish', function () {
-//     console.log('Completed')
-// })
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database:"nserver_test"
+});
 
-const dump = spawn(/^win/.test(process.platform) ? 'mysqldump.cmd' : 'mysqldump', [
-    '-u',
-    'root',
-    '-p',
-    'nserver_test',
-])
+//connection
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+  //database
+  con.query("drop database if exists nserver_test", function (err, result) {
+    if (err) throw err;
+    console.log("Database nserver_test delete");
+  });
+  con.query("CREATE DATABASE nserver_test", function (err, result) {
+    if (err) throw err;
+    console.log("Database nserver_test created");
+  });
+  //table
+  var sql = "CREATE TABLE nserver_test.customers (name VARCHAR(255), address VARCHAR(255))";
+  con.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log("Table created");
+  });
+  //insert
+  var sql = "INSERT INTO nserver_test.customers (name, address) VALUES ('Company Inc', 'Highway 37')";
+  con.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log("1 record inserted");
+  });
+  //select
+  con.query("SELECT * FROM nserver_test.customers", function (err, result, fields) {
+    if (err) throw err;
+    console.log(result);
+  });
+});
 
-dump .stdout
-.pipe(writeStream)
-.on('finish', function () {
-    console.log('Completed')
+app.get('/', (req, res) => {
+    res.send('Hello World!')
 })
-.on('error', function (err) {
-    console.log(err)
+
+app.get('/get_file', async (req, res) => {
+  await mysqldump({
+      connection: {
+          host: 'localhost',
+          user: 'root',
+          password: '',
+          database: 'nserver_test',
+      },
+      dumpToFile: './dump.sql.gz',
+  });
+  let read = fs.createReadStream('./dump.sql.gz')
+  res.writeHead(200, {
+      'Content-Type': 'application/javascript',
+      'Content-Encoding': 'gz',
+      "Content-Disposition": 'attachment; filename="nserverdb.gz"',
+      }); 
+  read.pipe(res) 
 })
 
-// app.get('/', (req, res) => {
-//     res.send('Hello World!')
-// })
 
-// app.get('/get_file', async (req, res) => {
 
-// })
   
 
-// app.listen(port, () => {
-//     console.log(`Example app listening on port ${port}`)
-// })
+
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
