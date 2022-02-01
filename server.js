@@ -3,7 +3,10 @@ const express = require('express')
 const app = express()
 const port = 3000
 let fs = require('fs')
-//var Mysqldump = require('mysqldump-stream');
+
+//var stream = require('stream');
+const { Readable } = require("stream");
+
 const spawn = require('child_process').spawn
 
 var mysql = require('mysql');
@@ -53,28 +56,32 @@ app.get('/', (req, res) => {
 })
 
 app.get('/get_file', async (req, res) => {
-  await mysqldump({
+  var result = await mysqldump({
       connection: {
           host: 'localhost',
           user: 'root',
           password: '',
           database: 'nserver_test',
       },
-      dumpToFile: './dump.sql.gz',
+      //dumpToFile: './dump.sql.gz',
   });
-  let read = fs.createReadStream('./dump.sql.gz')
+  //console.log(result);
+  //let read = fs.createReadStream(Object.values(result));
+  const read = new Readable();
+
+  read.push(JSON.stringify(result));
+  read.push(null);
+  //read.pipe(process.stdout)
+  //console.log(read);
+  
   res.writeHead(200, {
       'Content-Type': 'application/javascript',
       'Content-Encoding': 'gz',
       "Content-Disposition": 'attachment; filename="nserverdb.gz"',
       }); 
+      
   read.pipe(res) 
 })
-
-
-
-  
-
 
 
 app.listen(port, () => {
