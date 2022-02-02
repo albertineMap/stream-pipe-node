@@ -55,7 +55,16 @@ app.get('/', (req, res) => {
 })
 
 app.get('/get_file', async (req, res) => {
-  var result = await mysqldump({
+  
+  res.writeHead(200, {
+    'Content-Type': 'application/javascript',
+    'Content-Encoding': 'gz',
+    "Content-Disposition": 'attachment; filename="nserverdb.sql.gz"',
+    })
+
+  const read = new Readable();
+
+  const result =  mysqldump({
       connection: {
           host: 'localhost',
           user: 'root',
@@ -63,28 +72,37 @@ app.get('/get_file', async (req, res) => {
           database: 'nserver_test',
       },
       //dumpToFile: './dump.sql.gz',
+  }).on('data', function (chunk) {
+    read.push(JSON.stringify(chunk));
+    read.push(null);
+    read.pipe(res);
   });
+  
+
   // console.log(result);
   //let read = fs.createReadStream(Object.values(result));
 
-  const read = new Readable();
+  //const read = new Readable();
+  /*
   let dumpFinal =  "";
   dumpFinal += result.dump.schema;
   dumpFinal += "\n\n";
   dumpFinal += result.dump.data;
-
+*/
   // console.log("\n\n" + dumpFinal);
   
+  /*
   read.push(dumpFinal);
   read.push(null);
-  
-  res.writeHead(200, {
+  */
+/*
+    res.writeHead(200, {
       'Content-Type': 'application/javascript',
       'Content-Encoding': 'gz',
       "Content-Disposition": 'attachment; filename="nserverdb.sql.gz"',
-      }); 
+      })
       
-  read.pipe(res) 
+*/
 })
 
 
